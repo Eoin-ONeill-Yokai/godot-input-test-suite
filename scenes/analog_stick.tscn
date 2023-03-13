@@ -51,6 +51,9 @@ func _unhandled_input(event):
 func _physics_process(delta):
 	if Engine.is_editor_hint():
 		queue_redraw()
+	
+	%Label.text = str(axis)
+	%Label.visible = axis.length() > 0.1 
 
 func _draw():
 	draw_arc(Vector2.ONE * RADIUS + Vector2.ONE * PADDING, RADIUS, 0.0, 2*PI, 32, Color.GHOST_WHITE, 5)
@@ -73,3 +76,9 @@ grow_horizontal = 2
 grow_vertical = 2
 script = SubResource("GDScript_sbwai")
 color = Color(0.309804, 0.596078, 1, 1)
+
+[node name="Label" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
