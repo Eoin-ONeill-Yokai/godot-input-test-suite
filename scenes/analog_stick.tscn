@@ -1,0 +1,75 @@
+[gd_scene load_steps=2 format=3 uid="uid://dgqi2cct3kjny"]
+
+[sub_resource type="GDScript" id="GDScript_sbwai"]
+script/source = "@tool
+extends Control
+
+enum StickPosition {
+	LEFT,
+	RIGHT
+}
+
+@export var stick_position : StickPosition = StickPosition.LEFT
+
+var axis : Vector2 = Vector2.ZERO
+var pressed : bool = false
+
+const DIAMETER = 100
+const PADDING = DIAMETER/4
+const RADIUS = DIAMETER/2
+
+@export var color = Color.CORAL :
+	get:
+		return color
+	set(value):
+		color = value
+		queue_redraw()
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _unhandled_input(event):
+	if event is InputEventJoypadMotion and event.axis != JOY_AXIS_INVALID:
+		if stick_position == StickPosition.LEFT:
+			if event.axis == JOY_AXIS_LEFT_X:
+				axis.x = event.axis_value
+				queue_redraw()
+			elif event.axis == JOY_AXIS_LEFT_Y:
+				axis.y = event.axis_value
+				queue_redraw()
+		if stick_position == StickPosition.RIGHT:
+			if event.axis == JOY_AXIS_RIGHT_X:
+				axis.x = event.axis_value
+				queue_redraw()
+			elif event.axis == JOY_AXIS_RIGHT_Y:
+				axis.y = event.axis_value
+				queue_redraw()
+	elif event is InputEventJoypadButton:
+		var to_check = JOY_BUTTON_LEFT_STICK if stick_position == StickPosition.LEFT else JOY_BUTTON_RIGHT_STICK
+		if event.button_index == to_check:
+			pressed = event.pressed
+			queue_redraw()
+
+func _physics_process(delta):
+	if Engine.is_editor_hint():
+		queue_redraw()
+
+func _draw():
+	draw_arc(Vector2.ONE * RADIUS + Vector2.ONE * PADDING, RADIUS, 0.0, 2*PI, 32, Color.GHOST_WHITE, 5)
+	if not Engine.is_editor_hint():
+		if pressed:
+			draw_circle(Vector2.ONE * RADIUS + Vector2.ONE * PADDING + axis * RADIUS, RADIUS/2, color)
+		else:
+			draw_arc(Vector2.ONE * RADIUS + Vector2.ONE * PADDING + axis * RADIUS, RADIUS/2, 0, 2*PI, 16, color, 5.0)
+
+func _get_minimum_size():
+	return Vector2.ONE * DIAMETER + Vector2.ONE * (PADDING * 2)
+"
+
+[node name="AnalogStick" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = SubResource("GDScript_sbwai")
+color = Color(0.309804, 0.596078, 1, 1)

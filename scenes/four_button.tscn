@@ -1,0 +1,81 @@
+[gd_scene load_steps=2 format=3 uid="uid://bsxxd7lvtdiir"]
+
+[sub_resource type="GDScript" id="GDScript_pcd8m"]
+script/source = "@tool
+extends Control
+
+enum FourButtonType {
+	DPAD,
+	ABXY
+}
+
+@export var type : FourButtonType = FourButtonType.DPAD : 
+	get:
+		return type
+	set(value):
+		type = value
+		queue_redraw()
+
+@export var color : Color = Color.CORAL : 
+	get:
+		return color
+	set(value):
+		color = value
+		queue_redraw()
+
+
+const WIDTH = 100
+const HEIGHT = WIDTH
+const PADDING = WIDTH / 4
+
+const BUTTON_DIAMETER = WIDTH / 3
+
+enum ButtonIndex {
+	UP,
+	RIGHT,
+	DOWN,
+	LEFT,
+	PLUS,
+	COUNT
+}
+
+var buttons = [false, false, false, false, false]
+
+func _draw():
+	var position_up = Vector2(PADDING + WIDTH / 2, PADDING + BUTTON_DIAMETER / 2)
+	var position_right = Vector2(PADDING + WIDTH - BUTTON_DIAMETER / 2, PADDING + HEIGHT / 2)
+	var position_down = Vector2(PADDING + WIDTH / 2, PADDING + HEIGHT - BUTTON_DIAMETER / 2)
+	var position_left = Vector2(PADDING + BUTTON_DIAMETER / 2, PADDING + HEIGHT / 2)
+	var position_plus = Vector2.ONE * PADDING if type == FourButtonType.ABXY else Vector2(PADDING + WIDTH, PADDING)
+	
+	var positions = [position_up, position_right, position_down, position_left, position_plus]
+	
+	for i in range(0, ButtonIndex.COUNT):
+		if buttons[i]:
+			draw_circle(positions[i], BUTTON_DIAMETER / 2, color)
+		else:
+			draw_arc(positions[i], BUTTON_DIAMETER / 2, 0, 2*PI, 16, Color.GHOST_WHITE, 5.0)
+
+func _unhandled_input(event):
+	if event is InputEventJoypadButton:
+		var to_check =  [JOY_BUTTON_DPAD_UP, JOY_BUTTON_DPAD_RIGHT, JOY_BUTTON_DPAD_DOWN, JOY_BUTTON_DPAD_LEFT, JOY_BUTTON_BACK] \\
+						if type == FourButtonType.DPAD else \\
+						[JOY_BUTTON_Y, JOY_BUTTON_B, JOY_BUTTON_A, JOY_BUTTON_X, JOY_BUTTON_START]
+		
+		for i in range(0, ButtonIndex.COUNT):
+			if event.button_index == to_check[i]:
+				buttons[i] = event.pressed
+				queue_redraw()
+
+func _get_minimum_size():
+	return Vector2(PADDING * 2 + WIDTH, PADDING * 2 + HEIGHT)
+"
+
+[node name="FourButton" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = SubResource("GDScript_pcd8m")

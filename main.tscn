@@ -1,0 +1,48 @@
+[gd_scene load_steps=4 format=3 uid="uid://c57uqadlwgetd"]
+
+[ext_resource type="PackedScene" uid="uid://df4x5jmv8wpk7" path="res://scenes/shoulder_buttons.tscn" id="1_fayqg"]
+[ext_resource type="PackedScene" uid="uid://dgqi2cct3kjny" path="res://scenes/analog_stick.tscn" id="1_g4riw"]
+[ext_resource type="PackedScene" uid="uid://bsxxd7lvtdiir" path="res://scenes/four_button.tscn" id="3_uba3a"]
+
+[node name="Control" type="HBoxContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="LHS" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="ShoulderButtons" parent="LHS" instance=ExtResource("1_fayqg")]
+layout_mode = 2
+color = Color(0.309804, 0.596078, 1, 1)
+
+[node name="AnalogStick" parent="LHS" instance=ExtResource("1_g4riw")]
+layout_mode = 2
+
+[node name="FourButton" parent="LHS" instance=ExtResource("3_uba3a")]
+layout_mode = 2
+color = Color(0.309804, 0.596078, 1, 1)
+
+[node name="Control" type="Control" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="ShoulderButtons" parent="VBoxContainer" instance=ExtResource("1_fayqg")]
+layout_mode = 2
+side = 1
+color = Color(1, 0.678431, 0.309804, 1)
+
+[node name="AnalogStick2" parent="VBoxContainer" instance=ExtResource("1_g4riw")]
+layout_mode = 2
+stick_position = 1
+color = Color(1, 0.678431, 0.309804, 1)
+
+[node name="FourButton" parent="VBoxContainer" instance=ExtResource("3_uba3a")]
+layout_mode = 2
+type = 1
+color = Color(1, 0.678431, 0.309804, 1)

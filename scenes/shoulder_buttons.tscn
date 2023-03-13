@@ -1,0 +1,64 @@
+[gd_scene load_steps=2 format=3 uid="uid://df4x5jmv8wpk7"]
+
+[sub_resource type="GDScript" id="GDScript_n8ass"]
+script/source = "@tool
+extends Control
+
+enum ShoulderSide {
+	LEFT,
+	RIGHT
+}
+
+@export var side = ShoulderSide.LEFT
+
+var button = false
+var axis = 0.0 
+
+var WIDTH = 100
+var PADDING = WIDTH / 4
+var BUTTON_BRIDGE = PADDING / 2
+var HEIGHT = WIDTH / 2
+
+@export var color = Color.CORAL :
+	get:
+		return color
+	set(value):
+		color = value
+		queue_redraw()
+
+func _unhandled_input(event):
+	var button_index_to_check = JOY_BUTTON_LEFT_SHOULDER if side == ShoulderSide.LEFT else JOY_BUTTON_RIGHT_SHOULDER
+	var axis_index_to_check = JOY_AXIS_TRIGGER_LEFT if side == ShoulderSide.LEFT else JOY_AXIS_TRIGGER_RIGHT
+	
+	if event is InputEventJoypadButton:
+		if event.button_index == button_index_to_check:
+			button = event.pressed
+			queue_redraw()
+	elif event is InputEventJoypadMotion:
+		if event.axis == axis_index_to_check:
+			axis = event.axis_value
+			queue_redraw()
+
+func _draw():
+	var trigger_rect = Rect2(Vector2.ONE * PADDING + Vector2.DOWN * HEIGHT / 2 - Vector2.DOWN * HEIGHT / 2 * axis, Vector2(WIDTH, max(HEIGHT / 2 * axis, 0.0)))
+	draw_rect(trigger_rect, Color.GHOST_WHITE if axis < 0.9 else color, false if axis < 0.9 else true, 5.0 )
+	
+	var button_rect = Rect2(Vector2.ONE * PADDING + Vector2.DOWN * (HEIGHT / 2 + BUTTON_BRIDGE), Vector2(WIDTH, HEIGHT / 2))
+	draw_rect(button_rect, Color.GHOST_WHITE if not button else color, button, 5.0)
+
+func _get_minimum_size():
+	return Vector2(WIDTH + PADDING * 2, HEIGHT + PADDING * 2 + BUTTON_BRIDGE)
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta):
+	pass
+"
+
+[node name="ShoulderButtons" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = SubResource("GDScript_n8ass")
